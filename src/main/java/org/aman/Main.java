@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
 
         StudentRepository studentRepository = new StudentRepository();
-        studentRepository.createStudent(new Student("Aman", "aman@gmail.com", 25));
+        studentRepository.createStudent(new Student("Anshu", "anshu@gmail.com", 25));
         // studentRepository.updateStudent();
         // studentRepository.deleteStudent();
         // studentRepository.getStudentById();

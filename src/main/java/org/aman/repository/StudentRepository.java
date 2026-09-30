@@ -3,6 +3,8 @@ package org.aman.repository;
 import org.aman.model.Student;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudentRepository {
 
@@ -11,63 +13,81 @@ public class StudentRepository {
     String password = "123456";
 
     public void createStudent(Student student) {
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
 
-            Statement statement = connection.createStatement();
+        String sql = """
+                    insert into students (name, email, age)
+                    values (?, ?, ?)
+                    """;
 
-            String sql = """
-                            insert into students (name, email, age)
-                            values ('%s', '%s', '%d')
-                            """.formatted(student.getName(), student.getEmail(), student.getAge());
+        try (
+                Connection connection = DriverManager.getConnection(url, username, password);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ) {
 
-            int result = statement.executeUpdate(sql);
+            preparedStatement.setString(1, student.getName());
+            preparedStatement.setString(2, student.getEmail());
+            preparedStatement.setInt(3, student.getAge());
 
-            if(result == 1) {
+            int rowAffected = preparedStatement.executeUpdate();
+
+            if(rowAffected == 1) {
                 System.out.println("Create operation successful");
             } else {
-                System.out.println("Creation failed");
+                System.out.println("Create operation failed");
             }
-
-            connection.close();
         } catch (SQLException e) {
             System.out.println("Failed to connect to database");
             e.printStackTrace();
         }
     }
 
-    public void updateStudent() {
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
+    public void updateStudent(Student student, Long id) {
 
-            Statement statement = connection.createStatement();
+        String sql = """
+                        update students
+                        set name = ?,
+                            email = ?,
+                            age = ?
+                        where id = ?
+                        """;
 
-            String sql = "update students set age=25 where id=1";
+        try (
+                Connection connection = DriverManager.getConnection(url, username, password);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ) {
 
-            int result = statement.executeUpdate(sql);
+            preparedStatement.setString(1, student.getName());
+            preparedStatement.setString(2, student.getEmail());
+            preparedStatement.setInt(3, student.getAge());
+            preparedStatement.setLong(4, id);
 
-            if(result == 1) {
+            int rowAffected = preparedStatement.executeUpdate();
+
+            if(rowAffected == 1) {
                 System.out.println("Update operation successful");
             } else {
                 System.out.println("Update failed");
             }
-
-            connection.close();
         } catch (SQLException e) {
             System.out.println("Failed to connect to database");
             e.printStackTrace();
         }
     }
 
-    public void deleteStudent() {
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
+    public void deleteStudent(Long id) {
 
-            Statement statement = connection.createStatement();
+        String sql = """
+                        delete from students where id = ?
+                        """;
 
-            String sql = "delete from students where id=1";
+        try (
+                Connection connection = DriverManager.getConnection(url, username, password);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+                ) {
 
-            int result = statement.executeUpdate(sql);
+            preparedStatement.setLong(1, id);
+
+            int result = preparedStatement.executeUpdate();
 
             if(result == 1) {
                 System.out.println("Delete operation successful");
@@ -82,25 +102,57 @@ public class StudentRepository {
         }
     }
 
-    public void getStudentById() {
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
+    public void getStudentById(Long id) {
 
-            Statement statement = connection.createStatement();
+        String sql = """
+                        select id, name, email, age from students where id=?
+                        """;
 
-            String sql = "select id, name, email, age from students where id=2";
+        try (
+                Connection connection = DriverManager.getConnection(url, username, password);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ) {
 
-            ResultSet resultSet = statement.executeQuery(sql);
+            preparedStatement.setLong(1, id);
 
-            resultSet.next();
+            try (
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    ) {
 
-            Student student = mapRow(resultSet);
-
-            System.out.println(student);
-
-            connection.close();
+                if(resultSet.next()) {
+                    Student student = mapRow(resultSet);
+                    System.out.println(student);
+                }
+            }
         } catch (SQLException e) {
             System.out.println("Failed to connect to database");
+            e.printStackTrace();
+        }
+    }
+
+    public void getStudents() {
+        String sql = """
+                select id, name, email, age from students
+                """;
+
+        try (
+                Connection connection = DriverManager.getConnection(url, username, password);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ) {
+
+            try (
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    ) {
+                List<Student> studentList = new ArrayList<>();
+
+                while(resultSet.next()) {
+                    Student student = mapRow(resultSet);
+                    studentList.add(student);
+                }
+            } catch (SQLException e) {
+
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
