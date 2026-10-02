@@ -21,8 +21,8 @@ public class StudentRepository {
 
         try (
                 Connection connection = DriverManager.getConnection(url, username, password);
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                ) {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
 
             preparedStatement.setString(1, student.getName());
             preparedStatement.setString(2, student.getEmail());
@@ -44,17 +44,17 @@ public class StudentRepository {
     public void updateStudent(Student student, Long id) {
 
         String sql = """
-                        update students
-                        set name = ?,
-                            email = ?,
-                            age = ?
-                        where id = ?
-                        """;
+                    update students
+                    set name = ?,
+                        email = ?,
+                        age = ?
+                    where id = ?
+                    """;
 
         try (
                 Connection connection = DriverManager.getConnection(url, username, password);
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                ) {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
 
             preparedStatement.setString(1, student.getName());
             preparedStatement.setString(2, student.getEmail());
@@ -77,13 +77,13 @@ public class StudentRepository {
     public void deleteStudent(Long id) {
 
         String sql = """
-                        delete from students where id = ?
-                        """;
+                    delete from students where id = ?
+                    """;
 
         try (
                 Connection connection = DriverManager.getConnection(url, username, password);
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)
-                ) {
+        ) {
 
             preparedStatement.setLong(1, id);
 
@@ -105,13 +105,13 @@ public class StudentRepository {
     public void getStudentById(Long id) {
 
         String sql = """
-                        select id, name, email, age from students where id=?
-                        """;
+                    select id, name, email, age from students where id=?
+                    """;
 
         try (
                 Connection connection = DriverManager.getConnection(url, username, password);
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                ) {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
 
             preparedStatement.setLong(1, id);
 
@@ -132,13 +132,13 @@ public class StudentRepository {
 
     public void getStudents() {
         String sql = """
-                select id, name, email, age from students
-                """;
+                    select id, name, email, age from students
+                    """;
 
         try (
                 Connection connection = DriverManager.getConnection(url, username, password);
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                ) {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ) {
 
             try (
                     ResultSet resultSet = preparedStatement.executeQuery();
